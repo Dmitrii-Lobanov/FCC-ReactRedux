@@ -1,3 +1,31 @@
+// Redux Code:
+const ADD = 'ADD';
+
+const addMessage = (message) => {
+  return {
+    type: ADD,
+    message
+  }
+};
+
+const messageReducer = (state = [], action) => {
+  switch (action.type) {
+    case ADD:
+      return [
+        ...state,
+        action.message
+      ];
+    default:
+      return state;
+  }
+};
+
+
+
+const store = Redux.createStore(messageReducer);
+
+// React Code:
+
 class DisplayMessages extends React.Component {
   constructor(props) {
     super(props);
@@ -8,56 +36,47 @@ class DisplayMessages extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.submitMessage = this.submitMessage.bind(this);
   }
-  // add handleChange() and submitMessage() methods here
-  handleChange(event){
+  handleChange(event) {
     this.setState({
       input: event.target.value
     });
   }
-
-  submitMessage(){
-    let currentMessage = this.state.input;
+  submitMessage() {
+    const currentMessage = this.state.input;
     this.setState({
       input: '',
       messages: this.state.messages.concat(currentMessage)
     });
   }
-
   render() {
     return (
       <div>
         <h2>Type in a new Message:</h2>
-        <input value={this.state.input} onChange={this.handleChange} /><br />
-        <button type="button" onClick={this.submitMessage}>Add a message</button>
+        <input
+          value={this.state.input}
+          onChange={this.handleChange}/><br/>
+        <button onClick={this.submitMessage}>Submit</button>
         <ul>
-          {this.state.messages.map((message, idx) => {
-            return (
-              <li key={idx}>{message}</li>
-            )
-          })}
+          {this.state.messages.map( (message, idx) => {
+              return (
+                 <li key={idx}>{message}</li>
+              )
+            })
+          }
         </ul>
       </div>
     );
   }
 };
 
-// define ADD, addMessage(), messageReducer(), and store here:
-const ADD = 'ADD';
+const Provider = ReactRedux.Provider;
 
-const addMessage = (message) =>{
-    return {
-        type: ADD, 
-        message
-    };
+class AppWrapper extends React.Component {
+  render(){
+      return (
+          <Provider store={store}>
+        <DisplayMessages />
+    </Provider>
+      )
+  }
 };
-
-const messageReducer = (state=[], action) => {
-    switch(action.type){
-        case ADD:
-            return [...state, action.message];
-        default:
-            return state;
-    }
-}
-
-const store = Redux.createStore(messageReducer);
