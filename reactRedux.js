@@ -1,10 +1,10 @@
-// Redux Code:
+// Redux:
 const ADD = 'ADD';
 
 const addMessage = (message) => {
   return {
     type: ADD,
-    message
+    message: message
   }
 };
 
@@ -20,18 +20,18 @@ const messageReducer = (state = [], action) => {
   }
 };
 
-
-
 const store = Redux.createStore(messageReducer);
 
-// React Code:
+// React:
+const Provider = ReactRedux.Provider;
+const connect = ReactRedux.connect;
 
-class DisplayMessages extends React.Component {
+// Change code below this line
+class Presentational extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       input: '',
-      messages: []
     }
     this.handleChange = this.handleChange.bind(this);
     this.submitMessage = this.submitMessage.bind(this);
@@ -42,10 +42,9 @@ class DisplayMessages extends React.Component {
     });
   }
   submitMessage() {
-    const currentMessage = this.state.input;
+    this.props.submitNewMessage(this.state.input);
     this.setState({
       input: '',
-      messages: this.state.messages.concat(currentMessage)
     });
   }
   render() {
@@ -57,7 +56,7 @@ class DisplayMessages extends React.Component {
           onChange={this.handleChange}/><br/>
         <button onClick={this.submitMessage}>Submit</button>
         <ul>
-          {this.state.messages.map( (message, idx) => {
+          {this.props.messages.map( (message, idx) => {
               return (
                  <li key={idx}>{message}</li>
               )
@@ -68,15 +67,28 @@ class DisplayMessages extends React.Component {
     );
   }
 };
+// Change code above this line
 
-const Provider = ReactRedux.Provider;
+const mapStateToProps = (state) => {
+  return {messages: state}
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    submitNewMessage: (message) => {
+      dispatch(addMessage(message))
+    }
+  }
+};
+
+const Container = connect(mapStateToProps, mapDispatchToProps)(Presentational);
 
 class AppWrapper extends React.Component {
-  render(){
-      return (
-          <Provider store={store}>
-        <DisplayMessages />
-    </Provider>
-      )
+  render() {
+    return (
+      <Provider store={store}>
+        <Container/>
+      </Provider>
+    );
   }
 };
